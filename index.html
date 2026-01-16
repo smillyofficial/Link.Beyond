@@ -52,7 +52,7 @@
 
         .bubble-me {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            border-radius: 20px 20px 4px 20px;
+            border-radius: 24px 24px 4px 24px;
             color: white;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
@@ -60,16 +60,18 @@
         .bubble-them {
             background: var(--bubble-them);
             border: 1px solid var(--border);
-            border-radius: 20px 20px 20px 4px;
+            border-radius: 24px 24px 24px 4px;
         }
 
+        /* Large Profile Pictures */
         .pfp-circle {
-            width: 36px;
-            height: 36px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid var(--accent);
+            border: 3px solid var(--accent);
             background: #1e293b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .input-bar {
@@ -83,39 +85,22 @@
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #settings-panel.open { transform: translateX(0); }
-
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-        @keyframes dots {
-            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
-            40% { color: white; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
-            60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(0,0,0,0); }
-            80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white; }
+        
+        #auto-loader {
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
 <body>
 
-    <!-- Auth Overlay -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[200] px-6">
-        <div class="w-full max-w-sm text-center animate__animated animate__fadeIn">
-            <div class="w-20 h-20 bg-indigo-600 rounded-[2rem] mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-indigo-500/40 rotate-6">
+    <!-- Connection Overlay -->
+    <div id="auto-loader" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[200]">
+        <div class="animate__animated animate__pulse animate__infinite">
+            <div class="w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-indigo-500/40 rotate-6 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
             </div>
-            <h1 class="text-4xl font-black heading-font tracking-tighter text-white mb-2">LINK BEYOND</h1>
-            <p class="text-slate-500 mb-10 text-sm font-medium uppercase tracking-widest">Global Stream v2.0</p>
-            
-            <div class="space-y-4">
-                <input type="text" id="username-input" maxlength="15" placeholder="Pick a username" 
-                    class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none text-center font-bold text-xl text-white focus:border-indigo-500 focus:bg-white/10 transition-all">
-                
-                <button id="join-btn" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-500 active:scale-95 transition-all uppercase tracking-[0.2em] text-sm">
-                    Enter Beyond
-                </button>
-            </div>
         </div>
+        <p class="text-indigo-500 font-black tracking-[0.3em] text-xs uppercase mt-4">Connecting Globally...</p>
     </div>
 
     <!-- App Header -->
@@ -126,23 +111,24 @@
             </div>
             <div>
                 <h2 class="text-lg font-black heading-font tracking-tight leading-none">LINK BEYOND</h2>
-                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Network Active</span>
+                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Global Stream</span>
             </div>
         </div>
-        <button id="settings-toggle" class="p-3 bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition-transform">
+        <button id="settings-toggle" class="p-2 flex items-center gap-2 bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition-transform">
+            <img id="header-pfp" src="" class="h-10 w-10 rounded-full border-2 border-indigo-500 object-cover hidden">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <!-- Chat Stream -->
-    <main id="messages" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth"></main>
+    <main id="messages" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10 scroll-smooth"></main>
 
     <!-- Footer / Input -->
     <footer class="p-4 pb-safe glass-panel border-t-0 rounded-t-[2.5rem] shrink-0">
         <div id="image-preview-container" class="hidden mb-4 p-3 bg-indigo-600/10 rounded-2xl items-center justify-between border border-indigo-500/20">
             <div class="flex items-center gap-3">
                 <img id="image-preview" src="" class="h-14 w-14 object-cover rounded-xl border-2 border-indigo-500">
-                <span class="text-xs font-black uppercase tracking-widest text-indigo-400">Ready to Stream</span>
+                <span class="text-xs font-black uppercase tracking-widest text-indigo-400">Image Ready</span>
             </div>
             <button id="cancel-image" class="p-2 bg-red-500/20 text-red-500 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
@@ -153,7 +139,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             </button>
             <form id="chat-form" class="flex-1 flex items-center gap-2">
-                <input type="text" id="msg-input" autocomplete="off" placeholder="Message the stream..." class="flex-1 bg-transparent px-2 py-3 outline-none font-bold text-lg text-inherit placeholder:text-slate-500">
+                <input type="text" id="msg-input" autocomplete="off" placeholder="Message globally..." class="flex-1 bg-transparent px-2 py-3 outline-none font-bold text-lg text-inherit placeholder:text-slate-500">
                 <button type="submit" id="send-btn" class="p-4 px-6 bg-indigo-600 text-white rounded-2xl font-black text-sm tracking-widest uppercase active:scale-95 transition-all">Send</button>
             </form>
         </div>
@@ -162,21 +148,24 @@
     <!-- Settings Sidebar -->
     <aside id="settings-panel" class="fixed inset-y-0 right-0 w-[85%] max-w-sm glass-panel backdrop-blur-3xl z-[150] p-8 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]">
         <div class="flex justify-between items-center mb-12">
-            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Identity</h3>
+            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Settings</h3>
             <button id="close-settings" class="p-3 bg-white/5 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
-        <div class="space-y-10 flex-1">
+        <div class="space-y-10 flex-1 overflow-y-auto pr-2">
             <div class="text-center relative">
                 <div class="relative inline-block cursor-pointer group" id="pfp-trigger">
-                    <img id="settings-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" class="w-32 h-32 rounded-full border-4 border-indigo-600 object-cover bg-slate-800 shadow-2xl">
+                    <img id="settings-pfp" src="" class="w-56 h-56 rounded-full border-4 border-indigo-600 object-cover bg-slate-800 shadow-2xl mx-auto">
                     <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-white text-[10px] font-black uppercase">Edit Photo</span>
                     </div>
                 </div>
                 <input type="file" id="pfp-input" accept="image/*" class="hidden">
-                <h4 id="display-name" class="mt-6 text-2xl font-black heading-font">Username</h4>
-                <p class="text-xs font-black text-indigo-500 uppercase tracking-widest mt-1">Universal ID</p>
+                
+                <div class="mt-8 space-y-2">
+                    <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-left block ml-1">Your Name</label>
+                    <input type="text" id="name-edit-input" maxlength="15" class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl outline-none text-center font-bold text-2xl text-white focus:border-indigo-500 transition-all">
+                </div>
             </div>
 
             <div class="space-y-4">
@@ -189,8 +178,7 @@
                         <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     </div>
                 </button>
-
-                <button id="logout-btn" class="w-full py-5 text-red-500 font-black tracking-widest bg-red-500/10 rounded-3xl hover:bg-red-500 hover:text-white transition-all">RESET IDENTITY</button>
+                <button id="logout-btn" class="w-full py-5 text-red-500 font-black tracking-widest bg-red-500/10 rounded-3xl hover:bg-red-500 hover:text-white transition-all uppercase">Factory Reset</button>
             </div>
         </div>
     </aside>
@@ -200,29 +188,19 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIG SAFETY WRAPPER
-        const getFirebaseConfig = () => {
-            try {
-                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                    return JSON.parse(__firebase_config);
-                }
-            } catch(e) { console.error("Config error:", e); }
-            return null;
-        };
-
-        const config = getFirebaseConfig();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v2-prod';
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v2-final';
         
-        // Initialize globals to be assigned once Firebase is ready
         let auth, db, app;
-        let userState = { uid: null, name: '', pfp: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random() };
+        let userState = { 
+            uid: null, 
+            name: 'User_' + Math.floor(1000 + Math.random() * 9000), 
+            pfp: 'https://api.dicebear.com/7.x/shapes/svg?seed=' + Math.random() 
+        };
         let pendingImg = null;
 
-        // UI Reference Object
         const ui = {
-            authModal: document.getElementById('auth-modal'),
-            nameIn: document.getElementById('username-input'),
-            joinBtn: document.getElementById('join-btn'),
+            loader: document.getElementById('auto-loader'),
             messages: document.getElementById('messages'),
             chatForm: document.getElementById('chat-form'),
             msgIn: document.getElementById('msg-input'),
@@ -237,111 +215,95 @@
             pfpTrigger: document.getElementById('pfp-trigger'),
             pfpInput: document.getElementById('pfp-input'),
             settingsPfp: document.getElementById('settings-pfp'),
-            displayName: document.getElementById('display-name'),
+            headerPfp: document.getElementById('header-pfp'),
+            nameEdit: document.getElementById('name-edit-input'),
             themeBtn: document.getElementById('theme-toggle-btn'),
             themeLabel: document.getElementById('theme-label'),
             logoutBtn: document.getElementById('logout-btn')
         };
 
         const initFirebase = async () => {
-            if (!config) return;
-            app = initializeApp(config);
+            app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
 
-            // Setup Auth Listener
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userState.uid = user.uid;
-                    await startApp();
+                    startApp();
                 } else {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (err) { console.error("Auth failed:", err); }
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
                 }
             });
         };
 
         const startApp = async () => {
-            const saved = localStorage.getItem('lb_v2_identity');
+            const saved = localStorage.getItem('lb_v2_identity_final');
             if (saved) {
-                userState = JSON.parse(saved);
-                ui.settingsPfp.src = userState.pfp;
-                ui.displayName.textContent = userState.name;
+                userState = { ...userState, ...JSON.parse(saved) };
+            } else {
+                localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
             }
 
-            if (userState.name) {
-                ui.authModal.classList.add('hidden');
-                initChatListener();
-            } else {
-                ui.authModal.classList.remove('hidden');
-            }
+            ui.settingsPfp.src = userState.pfp;
+            ui.headerPfp.src = userState.pfp;
+            ui.headerPfp.classList.remove('hidden');
+            ui.nameEdit.value = userState.name;
+
+            ui.loader.style.opacity = '0';
+            setTimeout(() => ui.loader.classList.add('hidden'), 500);
+
+            initChatListener();
         };
 
-        // --- UI ACTIONS ---
-        ui.joinBtn.addEventListener('click', () => {
-            const val = ui.nameIn.value.trim();
-            if (val.length < 2) return;
-            
-            ui.joinBtn.disabled = true;
-            ui.joinBtn.innerHTML = "Synchronizing <span class='loading-dots'></span>";
-            
-            userState.name = val;
-            localStorage.setItem('lb_v2_identity', JSON.stringify(userState));
-            
-            setTimeout(() => {
-                ui.authModal.classList.add('animate__animated', 'animate__fadeOut');
-                setTimeout(() => {
-                    ui.authModal.classList.add('hidden');
-                    initChatListener();
-                }, 500);
-            }, 800);
-        });
+        // UI Listeners
+        ui.nameEdit.oninput = (e) => {
+            userState.name = e.target.value.trim() || 'User';
+            localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
+        };
 
-        ui.pfpTrigger.addEventListener('click', () => ui.pfpInput.click());
-        ui.pfpInput.addEventListener('change', (e) => {
+        ui.pfpTrigger.onclick = () => ui.pfpInput.click();
+        ui.pfpInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (ev) => {
                 userState.pfp = ev.target.result;
                 ui.settingsPfp.src = userState.pfp;
-                localStorage.setItem('lb_v2_identity', JSON.stringify(userState));
+                ui.headerPfp.src = userState.pfp;
+                localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
             };
             reader.readAsDataURL(file);
-        });
+        };
 
-        ui.uploadBtn.addEventListener('click', () => ui.imgIn.click());
-        ui.imgIn.addEventListener('change', (e) => {
+        ui.uploadBtn.onclick = () => ui.imgIn.click();
+        ui.imgIn.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (ev) => {
                 pendingImg = ev.target.result;
                 ui.imgPreview.src = pendingImg;
-                ui.imgPreviewCont.classList.remove('hidden');
-                ui.imgPreviewCont.classList.add('flex');
+                ui.imgPreviewCont.classList.replace('hidden', 'flex');
             };
             reader.readAsDataURL(file);
-        });
+        };
 
-        ui.cancelImg.addEventListener('click', () => {
+        ui.cancelImg.onclick = () => {
             pendingImg = null;
-            ui.imgPreviewCont.classList.add('hidden');
-            ui.imgPreviewCont.classList.remove('flex');
+            ui.imgPreviewCont.classList.replace('flex', 'hidden');
             ui.imgIn.value = '';
-        });
+        };
 
-        ui.chatForm.addEventListener('submit', async (e) => {
+        ui.chatForm.onsubmit = async (e) => {
             e.preventDefault();
             const body = ui.msgIn.value.trim();
             if (!body && !pendingImg) return;
-            if (!auth.currentUser) return;
-
+            
             const msgData = {
                 uid: userState.uid,
                 author: userState.name,
@@ -357,17 +319,15 @@
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
             } catch (err) { console.error("Post failed:", err); }
-        });
+        };
 
-        // --- DATA SYNC ---
         const initChatListener = () => {
-            if (!db) return;
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
             onSnapshot(q, (snap) => {
-                const raw = snap.docs.map(d => d.data());
-                const sorted = raw.sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
-                renderChat(sorted);
-            }, (err) => console.error("Snapshot error:", err));
+                const msgs = snap.docs.map(d => d.data())
+                    .sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                renderChat(msgs);
+            }, (err) => console.error("Stream error:", err));
         };
 
         const renderChat = (msgs) => {
@@ -375,15 +335,15 @@
             msgs.forEach(m => {
                 const isMe = m.uid === userState.uid;
                 const card = document.createElement('div');
-                card.className = `flex gap-3 mb-6 animate__animated animate__fadeInUp animate__faster ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
+                card.className = `flex gap-4 mb-10 animate__animated animate__fadeInUp animate__faster ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
                 
                 card.innerHTML = `
-                    <img src="${m.pfp}" class="pfp-circle shrink-0 self-end mb-1">
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]">
-                        <span class="text-[9px] font-black opacity-40 uppercase tracking-widest mb-1 px-1">${m.author}</span>
-                        <div class="p-4 ${isMe ? 'bubble-me' : 'bubble-them'}">
-                            ${m.image ? `<img src="${m.image}" class="rounded-xl mb-3 max-h-72 w-full object-contain bg-black/5">` : ''}
-                            ${m.body ? `<p class="font-bold leading-tight break-words text-[15px]">${m.body}</p>` : ''}
+                    <img src="${m.pfp}" class="pfp-circle shrink-0 self-end shadow-indigo-500/20">
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[82%]">
+                        <span class="text-[10px] font-black opacity-50 uppercase tracking-widest mb-2 px-2">${m.author}</span>
+                        <div class="p-5 ${isMe ? 'bubble-me' : 'bubble-them'}">
+                            ${m.image ? `<img src="${m.image}" class="rounded-2xl mb-3 max-h-80 w-full object-contain">` : ''}
+                            ${m.body ? `<p class="font-bold leading-relaxed break-words text-[16px]">${m.body}</p>` : ''}
                         </div>
                     </div>
                 `;
@@ -392,28 +352,23 @@
             ui.messages.scrollTop = ui.messages.scrollHeight;
         };
 
-        // --- NAVIGATION & THEME ---
         ui.settingsToggle.onclick = () => ui.settingsPanel.classList.add('open');
         ui.closeSettings.onclick = () => ui.settingsPanel.classList.remove('open');
         
-        let isDark = localStorage.getItem('lb_v2_theme') !== 'light';
         const applyTheme = (dark) => {
-            isDark = dark;
             document.body.classList.toggle('light-theme', !dark);
             ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
-            localStorage.setItem('lb_v2_theme', dark ? 'dark' : 'light');
+            localStorage.setItem('lb_v2_theme_final', dark ? 'dark' : 'light');
         };
-        ui.themeBtn.addEventListener('click', () => applyTheme(!isDark));
-        applyTheme(isDark);
+        ui.themeBtn.onclick = () => applyTheme(document.body.classList.contains('light-theme'));
+        applyTheme(localStorage.getItem('lb_v2_theme_final') !== 'light');
 
-        ui.logoutBtn.addEventListener('click', () => {
+        ui.logoutBtn.onclick = () => {
             localStorage.clear();
             location.reload();
-        });
+        };
 
-        // Initialize on Load
-        window.addEventListener('DOMContentLoaded', initFirebase);
-
+        window.onload = initFirebase;
     </script>
 </body>
 </html>
