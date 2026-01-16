@@ -2,360 +2,389 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Link Beyond | Global Connection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Beyond! - Global Chat</title>
+    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@300;500;700;900&display=swap');
-        
-        :root {
-            --bg-color: #020617;
-            --accent: #6366f1;
-            --accent-glow: rgba(99, 102, 241, 0.4);
-            --card-bg: rgba(15, 23, 42, 0.8);
-            --border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --bubble-them: rgba(255, 255, 255, 0.05);
-        }
-
-        .light-theme {
-            --bg-color: #f8fafc;
-            --accent: #4f46e5;
-            --accent-glow: rgba(79, 70, 229, 0.2);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --border: rgba(0, 0, 0, 0.1);
-            --text-main: #0f172a;
-            --bubble-them: rgba(0, 0, 0, 0.05);
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            height: 100dvh;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.3s ease;
-        }
-
-        .heading-font { font-family: 'Outfit', sans-serif; }
-
-        .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .bubble-me {
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            border-radius: 24px 24px 4px 24px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-        }
-        
-        .bubble-them {
-            background: var(--bubble-them);
-            border: 1px solid var(--border);
-            border-radius: 24px 24px 24px 4px;
-        }
-
-        .pfp-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent);
-            background: #1e293b;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .input-bar {
-            background: rgba(128, 128, 128, 0.08);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-        }
-
-        #settings-panel {
-            transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #settings-panel.open { transform: translateX(0); }
-        
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-    </style>
-</head>
-<body>
-
-    <!-- App Header -->
-    <header class="glass-panel px-6 py-4 flex justify-between items-center z-50 shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-            </div>
-            <div>
-                <h2 class="text-lg font-black heading-font tracking-tight leading-none uppercase">Link Beyond</h2>
-                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest text-inherit">Live Global Feed</span>
-            </div>
-        </div>
-        <button id="settings-toggle" class="p-1 flex items-center gap-2 bg-white/5 rounded-full border border-white/10 active:scale-90 transition-transform">
-            <img id="header-pfp" src="" class="h-10 w-10 rounded-full border-2 border-indigo-500 object-cover hidden">
-            <div class="pr-2 pl-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg></div>
-        </button>
-    </header>
-
-    <!-- Chat Stream -->
-    <main id="messages" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-10 scroll-smooth"></main>
-
-    <!-- Footer / Input -->
-    <footer class="p-4 pb-6 glass-panel border-t-0 rounded-t-[2rem] shrink-0">
-        <div id="image-preview-container" class="hidden mb-4 p-3 bg-indigo-600/10 rounded-2xl items-center justify-between border border-indigo-500/20">
-            <div class="flex items-center gap-3">
-                <img id="image-preview" src="" class="h-14 w-14 object-cover rounded-xl border-2 border-indigo-500">
-                <span class="text-xs font-black uppercase tracking-widest text-indigo-400">Image Attached</span>
-            </div>
-            <button id="cancel-image" class="p-2 bg-red-500/20 text-red-500 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-        </div>
-
-        <div class="input-bar p-2 flex items-center gap-2">
-            <input type="file" id="image-input" accept="image/*" class="hidden">
-            <button id="upload-btn" class="p-4 bg-indigo-600 text-white rounded-2xl shadow-lg active:scale-90 transition-transform">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            </button>
-            <form id="chat-form" class="flex-1 flex items-center gap-2">
-                <input type="text" id="msg-input" autocomplete="off" placeholder="Say something to the world..." class="flex-1 bg-transparent px-2 py-3 outline-none font-bold text-lg text-inherit placeholder:text-slate-500">
-                <button type="submit" id="send-btn" class="p-4 px-6 bg-indigo-600 text-white rounded-2xl font-black text-sm tracking-widest uppercase active:scale-95 transition-all">Send</button>
-            </form>
-        </div>
-    </footer>
-
-    <!-- Settings Sidebar -->
-    <aside id="settings-panel" class="fixed inset-y-0 right-0 w-[85%] max-w-sm glass-panel backdrop-blur-3xl z-[150] p-8 flex flex-col shadow-2xl">
-        <div class="flex justify-between items-center mb-12">
-            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Settings</h3>
-            <button id="close-settings" class="p-3 bg-white/5 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-        </div>
-
-        <div class="space-y-10 flex-1 overflow-y-auto pr-2">
-            <div class="text-center">
-                <div class="relative inline-block cursor-pointer group" id="pfp-trigger">
-                    <img id="settings-pfp" src="" class="w-48 h-48 rounded-full border-4 border-indigo-600 object-cover bg-slate-800 shadow-2xl mx-auto">
-                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span class="text-white text-[10px] font-black uppercase">Change Photo</span>
-                    </div>
-                </div>
-                <input type="file" id="pfp-input" accept="image/*" class="hidden">
-                
-                <div class="mt-8 space-y-2">
-                    <label class="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-left block ml-1">Profile Name</label>
-                    <input type="text" id="name-edit-input" maxlength="15" class="w-full p-4 bg-white/5 border border-white/10 rounded-2xl outline-none text-center font-bold text-2xl text-white focus:border-indigo-500 transition-all">
-                </div>
-            </div>
-
-            <div class="space-y-4 pt-4 border-t border-white/5">
-                <button id="theme-toggle-btn" class="w-full p-6 bg-black/5 dark:bg-white/5 rounded-3xl flex items-center justify-between border border-white/5 active:scale-95 transition-all">
-                    <div class="text-left">
-                        <p class="font-bold text-lg">Appearance</p>
-                        <p id="theme-label" class="text-[10px] text-indigo-500 uppercase font-black tracking-widest">Dark Mode</p>
-                    </div>
-                    <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
-                        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                    </div>
-                </button>
-                <button id="logout-btn" class="w-full py-5 text-slate-500 font-black tracking-widest bg-white/5 rounded-3xl active:scale-95 transition-all uppercase text-xs">Reset All Data</button>
-            </div>
-        </div>
-    </aside>
-
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-global';
+        // APP CONFIGURATION & STATE
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-chat-v1';
+        let db, auth;
+        let currentUser = null;
         
-        let auth, db, app;
-        let userState = { 
-            uid: null, 
-            name: 'User_' + Math.floor(Math.random() * 9000), 
-            pfp: 'https://api.dicebear.com/7.x/shapes/svg?seed=' + Math.random() 
-        };
-        let pendingImg = null;
+        // 1. LOAD SETTINGS SAFELY (Defaults if nothing saved)
+        let isDarkMode = localStorage.getItem('theme') === 'dark';
+        
+        let savedProfile;
+        try {
+            savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+        } catch (e) {
+            console.error("Profile load error", e);
+        }
 
-        const ui = {
-            messages: document.getElementById('messages'),
-            chatForm: document.getElementById('chat-form'),
-            msgIn: document.getElementById('msg-input'),
-            uploadBtn: document.getElementById('upload-btn'),
-            imgIn: document.getElementById('image-input'),
-            imgPreviewCont: document.getElementById('image-preview-container'),
-            imgPreview: document.getElementById('image-preview'),
-            cancelImg: document.getElementById('cancel-image'),
-            settingsToggle: document.getElementById('settings-toggle'),
-            settingsPanel: document.getElementById('settings-panel'),
-            closeSettings: document.getElementById('close-settings'),
-            pfpTrigger: document.getElementById('pfp-trigger'),
-            pfpInput: document.getElementById('pfp-input'),
-            settingsPfp: document.getElementById('settings-pfp'),
-            headerPfp: document.getElementById('header-pfp'),
-            nameEdit: document.getElementById('name-edit-input'),
-            themeBtn: document.getElementById('theme-toggle-btn'),
-            themeLabel: document.getElementById('theme-label'),
-            logoutBtn: document.getElementById('logout-btn')
+        let userProfile = savedProfile || {
+            username: `User_${Math.floor(Math.random() * 9000) + 1000}`,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`
         };
 
-        const initFirebase = async () => {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
+        // BANNED WORDS LIST
+        const bannedWords = [/child\s*porn/gi, /nigger/gi, /nigga/gi];
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userState.uid = user.uid;
-                    startApp();
+        function filterContent(text) {
+            if (typeof text !== 'string') return text;
+            let filtered = text;
+            bannedWords.forEach(pattern => {
+                filtered = filtered.replace(pattern, "****");
+            });
+            return filtered;
+        }
+
+        // INITIALIZE FIREBASE
+        async function initFirebase() {
+            let config;
+            const isGitHub = window.location.hostname.includes('github.io');
+            
+            if (typeof __firebase_config !== 'undefined') {
+                config = JSON.parse(__firebase_config);
+            } else {
+                const savedConfig = localStorage.getItem('firebaseConfig');
+                if (savedConfig) {
+                    config = JSON.parse(savedConfig);
+                } else if (isGitHub) {
+                    document.getElementById('setup-overlay').classList.remove('hidden');
+                    return;
                 } else {
+                    console.warn("No Firebase configuration found.");
+                    return;
+                }
+            }
+
+            try {
+                const app = initializeApp(config);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initAuth = async () => {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
-                }
-            });
-        };
+                };
 
-        const startApp = () => {
-            const saved = localStorage.getItem('lb_v3_identity');
-            if (saved) {
-                userState = { ...userState, ...JSON.parse(saved) };
-            } else {
-                localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
+                await initAuth();
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        startChatListener();
+                    }
+                });
+            } catch (err) {
+                console.error("Firebase Init Error:", err);
             }
+        }
 
-            ui.settingsPfp.src = userState.pfp;
-            ui.headerPfp.src = userState.pfp;
-            ui.headerPfp.classList.remove('hidden');
-            ui.nameEdit.value = userState.name;
+        // CHAT LOGIC
+        function startChatListener() {
+            if (!currentUser) return;
+            const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+            const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(50));
 
-            initChatListener();
-        };
-
-        ui.nameEdit.oninput = (e) => {
-            userState.name = e.target.value.trim() || 'User';
-            localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
-        };
-
-        ui.pfpTrigger.onclick = () => ui.pfpInput.click();
-        ui.pfpInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                userState.pfp = ev.target.result;
-                ui.settingsPfp.src = userState.pfp;
-                ui.headerPfp.src = userState.pfp;
-                localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
-            };
-            reader.readAsDataURL(file);
-        };
-
-        ui.uploadBtn.onclick = () => ui.imgIn.click();
-        ui.imgIn.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                pendingImg = ev.target.result;
-                ui.imgPreview.src = pendingImg;
-                ui.imgPreviewCont.classList.replace('hidden', 'flex');
-            };
-            reader.readAsDataURL(file);
-        };
-
-        ui.cancelImg.onclick = () => {
-            pendingImg = null;
-            ui.imgPreviewCont.classList.replace('flex', 'hidden');
-            ui.imgIn.value = '';
-        };
-
-        ui.chatForm.onsubmit = async (e) => {
-            e.preventDefault();
-            if (!userState.uid) return;
-            
-            const body = ui.msgIn.value.trim();
-            if (!body && !pendingImg) return;
-            
-            const msgData = {
-                uid: userState.uid,
-                author: userState.name,
-                pfp: userState.pfp,
-                body: body,
-                image: pendingImg,
-                timestamp: serverTimestamp()
-            };
-
-            ui.msgIn.value = '';
-            ui.cancelImg.click();
-
-            try {
-                // Fixed Rule 1 compliance for global messages
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
-            } catch (err) { console.error("Send failed:", err); }
-        };
-
-        const initChatListener = () => {
-            if (!userState.uid) return;
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
-            onSnapshot(q, (snap) => {
-                const msgs = snap.docs.map(d => ({id: d.id, ...d.data()}))
-                    .sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
-                renderChat(msgs);
-            }, (err) => console.error("Stream error:", err));
-        };
-
-        const renderChat = (msgs) => {
-            ui.messages.innerHTML = '';
-            msgs.forEach(m => {
-                const isMe = m.uid === userState.uid;
-                const card = document.createElement('div');
-                card.className = `flex gap-4 mb-10 animate__animated animate__fadeInUp animate__faster ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
+            onSnapshot(q, (snapshot) => {
+                const messagesContainer = document.getElementById('messages');
+                // Auto-scroll logic
+                const isAtBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 150;
                 
-                card.innerHTML = `
-                    <img src="${m.pfp}" class="pfp-circle shrink-0 self-end shadow-indigo-500/20">
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%]">
-                        <span class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-2 px-2">${m.author}</span>
-                        <div class="p-5 ${isMe ? 'bubble-me' : 'bubble-them'}">
-                            ${m.image ? `<img src="${m.image}" class="rounded-2xl mb-3 max-h-96 w-full object-contain">` : ''}
-                            ${m.body ? `<p class="font-bold leading-relaxed break-words text-inherit">${m.body}</p>` : ''}
+                const messages = [];
+                snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+                
+                renderMessages(messages.reverse());
+                
+                if (isAtBottom) {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            }, (error) => {
+                console.error("Listener Error:", error);
+            });
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messages');
+            container.innerHTML = messages.map(msg => {
+                const isMe = msg.uid === currentUser?.uid;
+                const displayName = isMe ? "You" : msg.username;
+                const bubbleClass = isMe 
+                    ? (isDarkMode ? 'bg-indigo-600 text-white' : 'bg-indigo-500 text-white')
+                    : (isDarkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800');
+                const alignClass = isMe ? 'flex-row-reverse' : 'flex-row';
+
+                return `
+                <div class="flex ${alignClass} items-start gap-3 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <img src="${msg.avatar}" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-500 shadow-sm shrink-0" alt="avatar">
+                    <div class="flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold ${isDarkMode ? 'text-indigo-300' : 'text-indigo-600'}">${displayName}</span>
+                            <span class="text-[10px] opacity-50">${msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...'}</span>
+                        </div>
+                        <div class="${bubbleClass} p-3 rounded-2xl ${isMe ? 'rounded-tr-none' : 'rounded-tl-none'} shadow-sm mt-1 border ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}">
+                            ${msg.type === 'image' 
+                                ? `<img src="${msg.content}" class="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition" onclick="window.open('${msg.content}')">` 
+                                : `<p class="break-words leading-relaxed">${filterContent(msg.content)}</p>`}
                         </div>
                     </div>
-                `;
-                ui.messages.appendChild(card);
-            });
-            ui.messages.scrollTop = ui.messages.scrollHeight;
+                </div>
+            `}).join('');
+        }
+
+        window.sendMessage = async function(type = 'text', content = null) {
+            if (!currentUser || !db) return;
+            const input = document.getElementById('message-input');
+            const text = content || input.value.trim();
+            if (!text) return;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
+                    uid: currentUser.uid,
+                    username: userProfile.username,
+                    avatar: userProfile.avatar,
+                    content: type === 'text' ? text : text,
+                    type: type,
+                    timestamp: serverTimestamp()
+                });
+                if (type === 'text') input.value = '';
+            } catch (e) {
+                console.error("Send Error:", e);
+            }
         };
 
-        ui.settingsToggle.onclick = () => ui.settingsPanel.classList.add('open');
-        ui.closeSettings.onclick = () => ui.settingsPanel.classList.remove('open');
-        
-        const applyTheme = (dark) => {
-            document.body.classList.toggle('light-theme', !dark);
-            ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
-            localStorage.setItem('lb_v3_theme', dark ? 'dark' : 'light');
-        };
-        
-        ui.themeBtn.onclick = () => applyTheme(document.body.classList.contains('light-theme'));
-        applyTheme(localStorage.getItem('lb_v3_theme') !== 'light');
+        window.handleImageUpload = (event, isProfile = false) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 800000) {
+                alert("File too large! Please use images under 800KB.");
+                return;
+            }
 
-        ui.logoutBtn.onclick = () => {
-            localStorage.clear();
-            location.reload();
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (isProfile) {
+                    document.getElementById('profile-preview').src = e.target.result;
+                    window.pendingAvatar = e.target.result;
+                } else {
+                    window.sendMessage('image', e.target.result);
+                }
+            };
+            reader.readAsDataURL(file);
         };
 
-        window.onload = initFirebase;
+        window.toggleSettings = () => {
+            const modal = document.getElementById('settings-modal');
+            const isHidden = modal.classList.contains('hidden');
+            
+            if (isHidden) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                // Load current values into inputs
+                document.getElementById('set-username').value = userProfile.username;
+                document.getElementById('profile-preview').src = userProfile.avatar;
+                window.pendingAvatar = null; // Reset pending state
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.saveSettings = () => {
+            const newUsername = document.getElementById('set-username').value.trim();
+            if (newUsername) {
+                // Update State
+                userProfile.username = filterContent(newUsername);
+                if (window.pendingAvatar) {
+                    userProfile.avatar = window.pendingAvatar;
+                }
+                
+                // CRITICAL: Try-Catch block for storage
+                try {
+                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                    
+                    // Show success feedback
+                    const saveBtn = document.getElementById('save-btn');
+                    const originalText = saveBtn.innerText;
+                    saveBtn.innerText = "Saved!";
+                    saveBtn.classList.add('bg-green-500');
+                    
+                    setTimeout(() => {
+                        window.toggleSettings();
+                        saveBtn.innerText = originalText;
+                        saveBtn.classList.remove('bg-green-500');
+                    }, 800);
+
+                } catch (e) {
+                    alert("Storage Error: Your image might be too big to save locally. Try a smaller image.");
+                    console.error(e);
+                }
+            }
+        };
+
+        window.toggleTheme = () => {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            applyTheme();
+        };
+
+        function applyTheme() {
+            const body = document.body;
+            const container = document.getElementById('app-container');
+            const themeBtn = document.getElementById('theme-icon');
+            
+            if (isDarkMode) {
+                body.classList.add('dark', 'bg-gray-950');
+                container.classList.add('bg-gray-900', 'text-white');
+                container.classList.remove('bg-white');
+            } else {
+                body.classList.remove('dark', 'bg-gray-950');
+                container.classList.add('bg-white');
+                container.classList.remove('bg-gray-900', 'text-white');
+            }
+            if(themeBtn) themeBtn.innerHTML = isDarkMode ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+            lucide.createIcons();
+            
+            // Re-render chat if open to update bubble colors immediately
+            // Since we don't have the messages array here globally, we just let the next snapshot update fix colors,
+            // or we could force a re-render if we stored messages. 
+            // For now, the container bg updates instantly, bubbles update on next message or refresh.
+        }
+
+        window.submitConfig = () => {
+            const val = document.getElementById('config-input').value;
+            try {
+                JSON.parse(val);
+                localStorage.setItem('firebaseConfig', val);
+                document.getElementById('setup-overlay').classList.add('hidden');
+                location.reload(); // Only reload here, as this is a one-time setup
+            } catch(e) {
+                alert("Invalid JSON format.");
+            }
+        };
+
+        // RUN IMMEDIATELY ON LOAD
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTheme(); // Set theme immediately
+            initFirebase();
+            lucide.createIcons();
+            
+            const msgInput = document.getElementById('message-input');
+            if(msgInput) {
+                msgInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') window.sendMessage();
+                });
+            }
+        });
     </script>
+
+    <style>
+        .animate-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #4f46e5; }
+    </style>
+</head>
+<body class="transition-colors duration-300 font-sans h-screen flex flex-col items-center justify-center p-0 md:p-4 overflow-hidden">
+
+    <!-- SETUP OVERLAY -->
+    <div id="setup-overlay" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl max-w-md w-full shadow-2xl border border-indigo-500/30">
+            <h2 class="text-2xl font-black mb-4 text-indigo-600">Link Beyond! Setup</h2>
+            <p class="text-sm opacity-70 mb-6">Paste your <b>Firebase Configuration JSON</b>. This saves to your browser.</p>
+            <textarea id="config-input" class="w-full h-32 p-3 rounded-xl border border-gray-300 dark:bg-gray-800 dark:border-gray-700 font-mono text-xs mb-4" placeholder='{ "apiKey": "...", "authDomain": "...", ... }'></textarea>
+            <button onclick="submitConfig()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg">Connect Global Chat</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-container" class="w-full max-w-4xl h-full md:h-[90vh] flex flex-col shadow-2xl overflow-hidden md:rounded-3xl border border-indigo-500/10">
+        
+        <header class="p-4 border-b flex items-center justify-between bg-indigo-600 text-white shrink-0 z-10 shadow-md">
+            <div class="flex items-center gap-2">
+                <div class="bg-white p-1.5 rounded-xl shadow-lg">
+                    <i data-lucide="zap" class="text-indigo-600 w-6 h-6"></i>
+                </div>
+                <h1 class="text-xl font-black tracking-tighter">Link Beyond!</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" id="theme-icon" class="p-2 hover:bg-white/10 rounded-full transition"></button>
+                <button onclick="toggleSettings()" class="p-2 hover:bg-white/10 rounded-full transition">
+                    <i data-lucide="settings"></i>
+                </button>
+            </div>
+        </header>
+
+        <main id="messages" class="flex-1 overflow-y-auto p-4 md:p-6 bg-opacity-30 flex flex-col">
+            <div class="flex-1 flex flex-col items-center justify-center opacity-30">
+                <p>Establishing link...</p>
+            </div>
+        </main>
+
+        <footer class="p-4 border-t bg-inherit shrink-0 z-10">
+            <div class="flex items-center gap-2 max-w-5xl mx-auto">
+                <label class="cursor-pointer p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition">
+                    <i data-lucide="image" class="w-6 h-6 text-indigo-500"></i>
+                    <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+                </label>
+                <input id="message-input" type="text" placeholder="Type something..." 
+                    class="flex-1 p-3 px-5 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 px-5 rounded-full font-bold transition flex items-center gap-2 shadow-lg active:scale-95">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[60] bg-black/60 items-center justify-center p-4 backdrop-blur-sm animate-in">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-[2.5rem] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 text-gray-900 dark:text-white">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-black tracking-tight">Settings</h2>
+                <button onclick="toggleSettings()" class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-red-500 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-8">
+                <!-- Profile Pic Section -->
+                <div class="flex flex-col items-center gap-4">
+                    <div class="relative group">
+                        <img id="profile-preview" src="" class="w-24 h-24 rounded-full object-cover border-4 border-indigo-500 shadow-xl" alt="Preview">
+                        <label class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition">
+                            <i data-lucide="camera" class="text-white"></i>
+                            <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(event, true)">
+                        </label>
+                    </div>
+                    <p class="text-xs font-medium opacity-60">Tap photo to change</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-black uppercase tracking-widest text-indigo-500">Username</label>
+                    <input id="set-username" type="text" class="w-full p-4 rounded-2xl border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:border-indigo-500 outline-none transition font-bold">
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button onclick="toggleSettings()" class="flex-1 py-4 px-6 rounded-2xl font-bold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition">Cancel</button>
+                    <button id="save-btn" onclick="saveSettings()" class="flex-[2] bg-indigo-600 text-white py-4 px-6 rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-500/30">Save Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
