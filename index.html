@@ -13,20 +13,20 @@
             --bg-color: #020617;
             --accent: #6366f1;
             --accent-glow: rgba(99, 102, 241, 0.4);
-            --card-bg: rgba(15, 23, 42, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(15, 23, 42, 0.8);
+            --border: rgba(255, 255, 255, 0.1);
             --text-main: #f8fafc;
             --bubble-them: rgba(255, 255, 255, 0.05);
         }
 
         .light-theme {
-            --bg-color: #f1f5f9;
+            --bg-color: #f8fafc;
             --accent: #4f46e5;
             --accent-glow: rgba(79, 70, 229, 0.2);
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --border: rgba(0, 0, 0, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border: rgba(0, 0, 0, 0.1);
             --text-main: #0f172a;
-            --bubble-them: rgba(0, 0, 0, 0.04);
+            --bubble-them: rgba(0, 0, 0, 0.05);
         }
 
         body {
@@ -45,154 +45,153 @@
 
         .glass-panel {
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--border);
         }
-
-        .chat-scroll::-webkit-scrollbar { width: 3px; }
-        .chat-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         .bubble-me {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            border-radius: 18px 18px 4px 18px;
+            border-radius: 20px 20px 4px 20px;
             color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
         
         .bubble-them {
             background: var(--bubble-them);
             border: 1px solid var(--border);
-            border-radius: 18px 18px 18px 4px;
+            border-radius: 20px 20px 20px 4px;
         }
 
         .pfp-circle {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--accent);
-            background: var(--border);
+            background: #1e293b;
         }
 
         .input-bar {
             background: rgba(128, 128, 128, 0.08);
             border: 1px solid var(--border);
-            border-radius: 2rem;
+            border-radius: 1.5rem;
         }
 
-        #image-preview-container {
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Mobile specific adjustments */
-        @media (max-width: 640px) {
-            .bubble-me, .bubble-them { font-size: 14px; padding: 12px 16px; }
-            .pfp-circle { width: 28px; height: 28px; }
-        }
-
-        /* Settings Drawer Toggle */
         #settings-panel {
             transform: translateX(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #settings-panel.open { transform: translateX(0); }
+
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            40% { color: white; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(0,0,0,0); }
+            80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white; }
+        }
     </style>
 </head>
 <body>
 
     <!-- Auth Overlay -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-[200] px-6">
-        <div class="w-full max-w-sm text-center">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[200] px-6">
+        <div class="w-full max-w-sm text-center animate__animated animate__fadeIn">
+            <div class="w-20 h-20 bg-indigo-600 rounded-[2rem] mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-indigo-500/40 rotate-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
             </div>
-            <h1 class="text-3xl font-black heading-font tracking-tight text-white mb-2">LINK BEYOND</h1>
-            <p class="text-slate-500 mb-8 text-sm">Synchronize your consciousness.</p>
+            <h1 class="text-4xl font-black heading-font tracking-tighter text-white mb-2">LINK BEYOND</h1>
+            <p class="text-slate-500 mb-10 text-sm font-medium uppercase tracking-widest">Global Stream v2.0</p>
             
-            <input type="text" id="username-input" maxlength="15" placeholder="Pick a username" 
-                class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none text-center font-bold text-lg text-white mb-4 focus:border-indigo-500 transition-all">
-            
-            <button id="join-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg btn-hover uppercase tracking-widest">Enter Beyond</button>
+            <div class="space-y-4">
+                <input type="text" id="username-input" maxlength="15" placeholder="Pick a username" 
+                    class="w-full p-5 bg-white/5 border border-white/10 rounded-2xl outline-none text-center font-bold text-xl text-white focus:border-indigo-500 focus:bg-white/10 transition-all">
+                
+                <button id="join-btn" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-indigo-500 active:scale-95 transition-all uppercase tracking-[0.2em] text-sm">
+                    Enter Beyond
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- App Header -->
-    <header class="glass-panel px-4 py-3 flex justify-between items-center z-50">
+    <header class="glass-panel px-6 py-4 flex justify-between items-center z-50 shrink-0">
         <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <h2 class="text-lg font-black heading-font tracking-tight">LINK BEYOND</h2>
+            <div>
+                <h2 class="text-lg font-black heading-font tracking-tight leading-none">LINK BEYOND</h2>
+                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Network Active</span>
+            </div>
         </div>
-        <button id="settings-toggle" class="p-2 bg-white/5 rounded-xl border border-white/10">
+        <button id="settings-toggle" class="p-3 bg-white/5 rounded-2xl border border-white/10 active:scale-90 transition-transform">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
     </header>
 
     <!-- Chat Stream -->
-    <main id="messages" class="flex-1 overflow-y-auto p-4 space-y-6 chat-scroll"></main>
+    <main id="messages" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth"></main>
 
     <!-- Footer / Input -->
-    <footer class="p-3 pb-safe glass-panel border-t-0 rounded-t-[2rem]">
-        <div id="image-preview-container" class="mb-3 p-2 bg-indigo-600/10 rounded-2xl flex items-center justify-between border border-indigo-500/20">
+    <footer class="p-4 pb-safe glass-panel border-t-0 rounded-t-[2.5rem] shrink-0">
+        <div id="image-preview-container" class="hidden mb-4 p-3 bg-indigo-600/10 rounded-2xl items-center justify-between border border-indigo-500/20">
             <div class="flex items-center gap-3">
-                <img id="image-preview" src="" class="h-12 w-12 object-cover rounded-lg border border-indigo-500/50">
-                <span class="text-xs font-bold opacity-70 uppercase tracking-tighter">Visual Ready</span>
+                <img id="image-preview" src="" class="h-14 w-14 object-cover rounded-xl border-2 border-indigo-500">
+                <span class="text-xs font-black uppercase tracking-widest text-indigo-400">Ready to Stream</span>
             </div>
-            <button id="cancel-image" class="p-2 text-red-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <button id="cancel-image" class="p-2 bg-red-500/20 text-red-500 rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
-        <div class="input-bar p-1 flex items-center gap-2">
+        <div class="input-bar p-2 flex items-center gap-2">
             <input type="file" id="image-input" accept="image/*" class="hidden">
-            <button id="upload-btn" class="p-3 bg-indigo-600 text-white rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <button id="upload-btn" class="p-4 bg-indigo-600 text-white rounded-2xl shadow-lg active:scale-90 transition-transform">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             </button>
             <form id="chat-form" class="flex-1 flex items-center gap-2">
-                <input type="text" id="msg-input" placeholder="Say something..." class="flex-1 bg-transparent py-2 outline-none font-medium text-inherit">
-                <button type="submit" class="p-3 px-5 bg-indigo-600 text-white rounded-2xl font-black text-xs tracking-widest uppercase">Send</button>
+                <input type="text" id="msg-input" autocomplete="off" placeholder="Message the stream..." class="flex-1 bg-transparent px-2 py-3 outline-none font-bold text-lg text-inherit placeholder:text-slate-500">
+                <button type="submit" id="send-btn" class="p-4 px-6 bg-indigo-600 text-white rounded-2xl font-black text-sm tracking-widest uppercase active:scale-95 transition-all">Send</button>
             </form>
         </div>
     </footer>
 
     <!-- Settings Sidebar -->
-    <aside id="settings-panel" class="fixed inset-y-0 right-0 w-[85%] max-w-sm glass-panel z-[150] p-8 flex flex-col shadow-2xl">
-        <div class="flex justify-between items-center mb-10">
-            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Profile</h3>
-            <button id="close-settings" class="p-2 opacity-50"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <aside id="settings-panel" class="fixed inset-y-0 right-0 w-[85%] max-w-sm glass-panel backdrop-blur-3xl z-[150] p-8 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+        <div class="flex justify-between items-center mb-12">
+            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Identity</h3>
+            <button id="close-settings" class="p-3 bg-white/5 rounded-2xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
         </div>
 
-        <div class="space-y-8 flex-1">
-            <!-- PFP Customization -->
-            <div class="text-center">
-                <div class="relative inline-block group cursor-pointer" id="pfp-trigger">
-                    <img id="settings-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" class="w-24 h-24 rounded-full border-4 border-indigo-600 object-cover bg-slate-800">
-                    <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <div class="space-y-10 flex-1">
+            <div class="text-center relative">
+                <div class="relative inline-block cursor-pointer group" id="pfp-trigger">
+                    <img id="settings-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" class="w-32 h-32 rounded-full border-4 border-indigo-600 object-cover bg-slate-800 shadow-2xl">
+                    <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
-                    <input type="file" id="pfp-input" accept="image/*" class="hidden">
                 </div>
-                <p class="mt-4 font-bold text-lg" id="display-name">Username</p>
-                <p class="text-[10px] text-indigo-500 uppercase font-black tracking-widest">Active Identity</p>
+                <input type="file" id="pfp-input" accept="image/*" class="hidden">
+                <h4 id="display-name" class="mt-6 text-2xl font-black heading-font">Username</h4>
+                <p class="text-xs font-black text-indigo-500 uppercase tracking-widest mt-1">Universal ID</p>
             </div>
 
-            <!-- Appearance -->
-            <div class="p-5 bg-black/5 dark:bg-white/5 rounded-2xl flex items-center justify-between border border-white/5">
-                <div>
-                    <p class="font-bold">Appearance</p>
-                    <p id="theme-label" class="text-[10px] opacity-50 uppercase font-black">Dark Mode</p>
-                </div>
-                <button id="theme-toggle-btn" class="p-3 bg-indigo-600/20 text-indigo-400 rounded-xl">
-                    <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            <div class="space-y-4">
+                <button id="theme-toggle-btn" class="w-full p-6 bg-black/5 dark:bg-white/5 rounded-3xl flex items-center justify-between border border-white/5 active:scale-95 transition-all">
+                    <div class="text-left">
+                        <p class="font-bold text-lg">Appearance</p>
+                        <p id="theme-label" class="text-[10px] text-indigo-500 uppercase font-black tracking-widest">Dark Mode</p>
+                    </div>
+                    <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
+                        <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    </div>
                 </button>
-            </div>
 
-            <button id="logout-btn" class="w-full py-4 text-red-500 font-bold bg-red-500/10 rounded-xl mt-auto">Reset Identity</button>
+                <button id="logout-btn" class="w-full py-5 text-red-500 font-black tracking-widest bg-red-500/10 rounded-3xl hover:bg-red-500 hover:text-white transition-all">RESET IDENTITY</button>
+            </div>
         </div>
     </aside>
 
@@ -201,22 +200,23 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // GITHUB COMPATIBILITY: Robust config fetching
-        let config;
+        // GITHUB / PROD CONFIG SAFETY
+        let config = {};
         try {
             config = JSON.parse(__firebase_config);
         } catch(e) {
-            console.error("Firebase config missing. Ensure environment variables are set.");
+            console.warn("Config parsing failed. Fallback triggered.");
         }
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-gh';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v2-prod';
         const app = initializeApp(config);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let userState = { uid: null, name: '', pfp: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default' };
+        let userState = { uid: null, name: '', pfp: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random() };
         let pendingImg = null;
 
+        // UI Object
         const ui = {
             authModal: document.getElementById('auth-modal'),
             nameIn: document.getElementById('username-input'),
@@ -241,56 +241,65 @@
             logoutBtn: document.getElementById('logout-btn')
         };
 
-        // --- IDENTITY & AUTH ---
-        const initIdentity = () => {
-            const saved = localStorage.getItem('lb_identity');
+        // --- AUTH & INITIALIZATION ---
+        const startApp = async () => {
+            const saved = localStorage.getItem('lb_v2_identity');
             if (saved) {
                 userState = JSON.parse(saved);
                 ui.settingsPfp.src = userState.pfp;
                 ui.displayName.textContent = userState.name;
             }
+
+            if (userState.name) {
+                ui.authModal.classList.add('hidden');
+                initChatListener();
+            } else {
+                ui.authModal.classList.remove('hidden');
+            }
         };
 
-        const saveIdentity = () => localStorage.setItem('lb_identity', JSON.stringify(userState));
-
-        const startAuth = async () => {
+        const authenticate = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (err) { console.error("Auth failed:", err); }
+            } catch (err) {
+                console.error("Auth error:", err);
+            }
         };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userState.uid = user.uid;
-                initIdentity();
-                if (userState.name) login();
-                else ui.authModal.classList.remove('hidden');
-            } else startAuth();
+                startApp();
+            } else {
+                authenticate();
+            }
         });
 
-        const login = () => {
-            ui.authModal.classList.add('hidden');
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(40));
-            onSnapshot(q, (snap) => {
-                const msgs = snap.docs.map(doc => doc.data()).sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
-                render(msgs);
-            });
-        };
-
+        // --- UI ACTIONS ---
         ui.joinBtn.onclick = () => {
             const val = ui.nameIn.value.trim();
-            if (val.length >= 2) {
-                userState.name = val;
-                saveIdentity();
-                login();
-            }
+            if (val.length < 2) return;
+            
+            ui.joinBtn.disabled = true;
+            ui.joinBtn.innerHTML = "Synchronizing <span class='loading-dots'></span>";
+            
+            userState.name = val;
+            localStorage.setItem('lb_v2_identity', JSON.stringify(userState));
+            
+            setTimeout(() => {
+                ui.authModal.classList.add('animate__animated', 'animate__fadeOut');
+                setTimeout(() => {
+                    ui.authModal.classList.add('hidden');
+                    initChatListener();
+                }, 500);
+            }, 800);
         };
 
-        // --- PFP SYSTEM ---
+        // PFP Upload
         ui.pfpTrigger.onclick = () => ui.pfpInput.click();
         ui.pfpInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -299,23 +308,12 @@
             reader.onload = (ev) => {
                 userState.pfp = ev.target.result;
                 ui.settingsPfp.src = userState.pfp;
-                saveIdentity();
+                localStorage.setItem('lb_v2_identity', JSON.stringify(userState));
             };
             reader.readAsDataURL(file);
         };
 
-        // --- THEME ---
-        let isDark = localStorage.getItem('lb_theme') !== 'light';
-        const applyTheme = (dark) => {
-            isDark = dark;
-            document.body.classList.toggle('light-theme', !dark);
-            ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
-            localStorage.setItem('lb_theme', dark ? 'dark' : 'light');
-        };
-        ui.themeBtn.onclick = () => applyTheme(!isDark);
-        applyTheme(isDark);
-
-        // --- CHAT LOGIC ---
+        // Image Attachment
         ui.uploadBtn.onclick = () => ui.imgIn.click();
         ui.imgIn.onchange = (e) => {
             const file = e.target.files[0];
@@ -324,65 +322,95 @@
             reader.onload = (ev) => {
                 pendingImg = ev.target.result;
                 ui.imgPreview.src = pendingImg;
-                ui.imgPreviewCont.style.display = 'flex';
+                ui.imgPreviewCont.classList.remove('hidden');
+                ui.imgPreviewCont.classList.add('flex');
             };
             reader.readAsDataURL(file);
         };
 
         ui.cancelImg.onclick = () => {
             pendingImg = null;
-            ui.imgPreviewCont.style.display = 'none';
+            ui.imgPreviewCont.classList.add('hidden');
+            ui.imgPreviewCont.classList.remove('flex');
+            ui.imgIn.value = '';
         };
 
+        // Sending Message
         ui.chatForm.onsubmit = async (e) => {
             e.preventDefault();
-            const text = ui.msgIn.value.trim();
-            if (!text && !pendingImg) return;
+            const body = ui.msgIn.value.trim();
+            if (!body && !pendingImg) return;
 
-            const payload = {
+            const msgData = {
                 uid: userState.uid,
                 author: userState.name,
                 pfp: userState.pfp,
-                body: text,
+                body: body,
                 image: pendingImg,
                 timestamp: serverTimestamp()
             };
 
             ui.msgIn.value = '';
-            pendingImg = null;
-            ui.imgPreviewCont.style.display = 'none';
+            ui.cancelImg.click();
 
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), payload);
-            } catch (err) { console.error("Send failed:", err); }
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
+            } catch (err) {
+                console.error("Post failed:", err);
+            }
         };
 
-        const render = (msgs) => {
+        // --- DATA SYNC ---
+        const initChatListener = () => {
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
+            onSnapshot(q, (snap) => {
+                const raw = snap.docs.map(d => d.data());
+                const sorted = raw.sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                renderChat(sorted);
+            }, (err) => console.error("Snapshot error:", err));
+        };
+
+        const renderChat = (msgs) => {
             ui.messages.innerHTML = '';
             msgs.forEach(m => {
                 const isMe = m.uid === userState.uid;
-                const row = document.createElement('div');
-                row.className = `flex gap-3 items-end ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
+                const card = document.createElement('div');
+                card.className = `flex gap-3 mb-6 animate__animated animate__fadeInUp animate__faster ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
                 
-                row.innerHTML = `
-                    <img src="${m.pfp || 'https://api.dicebear.com/7.x/avataaars/svg?seed=anon'}" class="pfp-circle mb-1">
-                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[75%]">
-                        <span class="text-[9px] font-black opacity-40 uppercase tracking-tighter mb-1 px-1">${m.author}</span>
-                        <div class="p-3 md:p-4 ${isMe ? 'bubble-me' : 'bubble-them'}">
-                            ${m.image ? `<img src="${m.image}" class="rounded-xl mb-2 max-h-64 w-full object-contain bg-black/5">` : ''}
-                            ${m.body ? `<p class="font-semibold leading-tight break-words">${m.body}</p>` : ''}
+                card.innerHTML = `
+                    <img src="${m.pfp}" class="pfp-circle shrink-0 self-end mb-1">
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[80%]">
+                        <span class="text-[9px] font-black opacity-40 uppercase tracking-widest mb-1 px-1">${m.author}</span>
+                        <div class="p-4 ${isMe ? 'bubble-me' : 'bubble-them'}">
+                            ${m.image ? `<img src="${m.image}" class="rounded-xl mb-3 max-h-72 w-full object-contain bg-black/5">` : ''}
+                            ${m.body ? `<p class="font-bold leading-tight break-words text-[15px]">${m.body}</p>` : ''}
                         </div>
                     </div>
                 `;
-                ui.messages.appendChild(row);
+                ui.messages.appendChild(card);
             });
             ui.messages.scrollTop = ui.messages.scrollHeight;
         };
 
-        // UI toggles
+        // --- NAVIGATION & THEME ---
         ui.settingsToggle.onclick = () => ui.settingsPanel.classList.add('open');
         ui.closeSettings.onclick = () => ui.settingsPanel.classList.remove('open');
-        ui.logoutBtn.onclick = () => { localStorage.clear(); location.reload(); };
+        
+        let isDark = localStorage.getItem('lb_v2_theme') !== 'light';
+        const applyTheme = (dark) => {
+            isDark = dark;
+            document.body.classList.toggle('light-theme', !dark);
+            ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
+            localStorage.setItem('lb_v2_theme', dark ? 'dark' : 'light');
+        };
+        ui.themeBtn.onclick = () => applyTheme(!isDark);
+        applyTheme(isDark);
+
+        ui.logoutBtn.onclick = () => {
+            localStorage.clear();
+            location.reload();
+        };
+
     </script>
 </body>
 </html>
