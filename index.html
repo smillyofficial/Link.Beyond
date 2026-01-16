@@ -283,6 +283,8 @@
 
         ui.chatForm.onsubmit = async (e) => {
             e.preventDefault();
+            if (!userState.uid) return;
+            
             const body = ui.msgIn.value.trim();
             if (!body && !pendingImg) return;
             
@@ -299,16 +301,16 @@
             ui.cancelImg.click();
 
             try {
-                // RULE 1: Using the specific global path so messages are shared by everyone
+                // Fixed Rule 1 compliance for global messages
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
             } catch (err) { console.error("Send failed:", err); }
         };
 
         const initChatListener = () => {
-            // RULE 1 & 2: Simple query to a global public path
+            if (!userState.uid) return;
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
             onSnapshot(q, (snap) => {
-                const msgs = snap.docs.map(d => d.data())
+                const msgs = snap.docs.map(d => ({id: d.id, ...d.data()}))
                     .sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
                 renderChat(msgs);
             }, (err) => console.error("Stream error:", err));
@@ -344,6 +346,7 @@
             ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
             localStorage.setItem('lb_v3_theme', dark ? 'dark' : 'light');
         };
+        
         ui.themeBtn.onclick = () => applyTheme(document.body.classList.contains('light-theme'));
         applyTheme(localStorage.getItem('lb_v3_theme') !== 'light');
 
