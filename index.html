@@ -85,24 +85,11 @@
         }
         #settings-panel.open { transform: translateX(0); }
         
-        #auto-loader {
-            transition: opacity 0.5s ease;
-        }
-
         /* Hide scrollbar but keep functionality */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body>
-
-    <!-- Simple Connection Overlay -->
-    <div id="auto-loader" class="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[200]">
-        <div class="animate__animated animate__pulse animate__infinite">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl rotate-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            </div>
-        </div>
-    </div>
 
     <!-- App Header -->
     <header class="glass-panel px-6 py-4 flex justify-between items-center z-50 shrink-0">
@@ -112,7 +99,7 @@
             </div>
             <div>
                 <h2 class="text-lg font-black heading-font tracking-tight leading-none uppercase">Link Beyond</h2>
-                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Global Chat</span>
+                <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest text-inherit">Live Global Feed</span>
             </div>
         </div>
         <button id="settings-toggle" class="p-1 flex items-center gap-2 bg-white/5 rounded-full border border-white/10 active:scale-90 transition-transform">
@@ -201,7 +188,6 @@
         let pendingImg = null;
 
         const ui = {
-            loader: document.getElementById('auto-loader'),
             messages: document.getElementById('messages'),
             chatForm: document.getElementById('chat-form'),
             msgIn: document.getElementById('msg-input'),
@@ -255,13 +241,9 @@
             ui.headerPfp.classList.remove('hidden');
             ui.nameEdit.value = userState.name;
 
-            ui.loader.style.opacity = '0';
-            setTimeout(() => ui.loader.classList.add('hidden'), 500);
-
             initChatListener();
         };
 
-        // UI Handlers
         ui.nameEdit.oninput = (e) => {
             userState.name = e.target.value.trim() || 'User';
             localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
@@ -344,7 +326,7 @@
                         <span class="text-[10px] font-black opacity-40 uppercase tracking-widest mb-2 px-2">${m.author}</span>
                         <div class="p-5 ${isMe ? 'bubble-me' : 'bubble-them'}">
                             ${m.image ? `<img src="${m.image}" class="rounded-2xl mb-3 max-h-96 w-full object-contain">` : ''}
-                            ${m.body ? `<p class="font-bold leading-relaxed break-words">${m.body}</p>` : ''}
+                            ${m.body ? `<p class="font-bold leading-relaxed break-words text-inherit">${m.body}</p>` : ''}
                         </div>
                     </div>
                 `;
