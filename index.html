@@ -200,23 +200,25 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // GITHUB / PROD CONFIG SAFETY
-        let config = {};
-        try {
-            config = JSON.parse(__firebase_config);
-        } catch(e) {
-            console.warn("Config parsing failed. Fallback triggered.");
-        }
+        // CONFIG SAFETY WRAPPER
+        const getFirebaseConfig = () => {
+            try {
+                if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                    return JSON.parse(__firebase_config);
+                }
+            } catch(e) { console.error("Config error:", e); }
+            return null;
+        };
 
+        const config = getFirebaseConfig();
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v2-prod';
-        const app = initializeApp(config);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+        
+        // Initialize globals to be assigned once Firebase is ready
+        let auth, db, app;
         let userState = { uid: null, name: '', pfp: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + Math.random() };
         let pendingImg = null;
 
-        // UI Object
+        // UI Reference Object
         const ui = {
             authModal: document.getElementById('auth-modal'),
             nameIn: document.getElementById('username-input'),
@@ -241,7 +243,29 @@
             logoutBtn: document.getElementById('logout-btn')
         };
 
-        // --- AUTH & INITIALIZATION ---
+        const initFirebase = async () => {
+            if (!config) return;
+            app = initializeApp(config);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // Setup Auth Listener
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userState.uid = user.uid;
+                    await startApp();
+                } else {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (err) { console.error("Auth failed:", err); }
+                }
+            });
+        };
+
         const startApp = async () => {
             const saved = localStorage.getItem('lb_v2_identity');
             if (saved) {
@@ -258,29 +282,8 @@
             }
         };
 
-        const authenticate = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth error:", err);
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userState.uid = user.uid;
-                startApp();
-            } else {
-                authenticate();
-            }
-        });
-
         // --- UI ACTIONS ---
-        ui.joinBtn.onclick = () => {
+        ui.joinBtn.addEventListener('click', () => {
             const val = ui.nameIn.value.trim();
             if (val.length < 2) return;
             
@@ -297,11 +300,10 @@
                     initChatListener();
                 }, 500);
             }, 800);
-        };
+        });
 
-        // PFP Upload
-        ui.pfpTrigger.onclick = () => ui.pfpInput.click();
-        ui.pfpInput.onchange = (e) => {
+        ui.pfpTrigger.addEventListener('click', () => ui.pfpInput.click());
+        ui.pfpInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -311,11 +313,10 @@
                 localStorage.setItem('lb_v2_identity', JSON.stringify(userState));
             };
             reader.readAsDataURL(file);
-        };
+        });
 
-        // Image Attachment
-        ui.uploadBtn.onclick = () => ui.imgIn.click();
-        ui.imgIn.onchange = (e) => {
+        ui.uploadBtn.addEventListener('click', () => ui.imgIn.click());
+        ui.imgIn.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -326,20 +327,20 @@
                 ui.imgPreviewCont.classList.add('flex');
             };
             reader.readAsDataURL(file);
-        };
+        });
 
-        ui.cancelImg.onclick = () => {
+        ui.cancelImg.addEventListener('click', () => {
             pendingImg = null;
             ui.imgPreviewCont.classList.add('hidden');
             ui.imgPreviewCont.classList.remove('flex');
             ui.imgIn.value = '';
-        };
+        });
 
-        // Sending Message
-        ui.chatForm.onsubmit = async (e) => {
+        ui.chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const body = ui.msgIn.value.trim();
             if (!body && !pendingImg) return;
+            if (!auth.currentUser) return;
 
             const msgData = {
                 uid: userState.uid,
@@ -355,13 +356,12 @@
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
-            } catch (err) {
-                console.error("Post failed:", err);
-            }
-        };
+            } catch (err) { console.error("Post failed:", err); }
+        });
 
         // --- DATA SYNC ---
         const initChatListener = () => {
+            if (!db) return;
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
             onSnapshot(q, (snap) => {
                 const raw = snap.docs.map(d => d.data());
@@ -403,13 +403,16 @@
             ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
             localStorage.setItem('lb_v2_theme', dark ? 'dark' : 'light');
         };
-        ui.themeBtn.onclick = () => applyTheme(!isDark);
+        ui.themeBtn.addEventListener('click', () => applyTheme(!isDark));
         applyTheme(isDark);
 
-        ui.logoutBtn.onclick = () => {
+        ui.logoutBtn.addEventListener('click', () => {
             localStorage.clear();
             location.reload();
-        };
+        });
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', initFirebase);
 
     </script>
 </body>
