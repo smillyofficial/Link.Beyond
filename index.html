@@ -85,7 +85,6 @@
         }
         #settings-panel.open { transform: translateX(0); }
         
-        /* Hide scrollbar but keep functionality */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
@@ -177,7 +176,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v3-prod';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-global';
         
         let auth, db, app;
         let userState = { 
@@ -228,7 +227,7 @@
             });
         };
 
-        const startApp = async () => {
+        const startApp = () => {
             const saved = localStorage.getItem('lb_v3_identity');
             if (saved) {
                 userState = { ...userState, ...JSON.parse(saved) };
@@ -300,11 +299,13 @@
             ui.cancelImg.click();
 
             try {
+                // RULE 1: Using the specific global path so messages are shared by everyone
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgData);
             } catch (err) { console.error("Send failed:", err); }
         };
 
         const initChatListener = () => {
+            // RULE 1 & 2: Simple query to a global public path
             const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
             onSnapshot(q, (snap) => {
                 const msgs = snap.docs.map(d => d.data())
