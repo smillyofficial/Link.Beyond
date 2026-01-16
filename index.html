@@ -189,7 +189,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-v2-final';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-global-v3';
         
         let auth, db, app;
         let userState = { 
@@ -242,11 +242,11 @@
         };
 
         const startApp = async () => {
-            const saved = localStorage.getItem('lb_v2_identity_final');
+            const saved = localStorage.getItem('lb_v3_identity');
             if (saved) {
                 userState = { ...userState, ...JSON.parse(saved) };
             } else {
-                localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
+                localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
             }
 
             ui.settingsPfp.src = userState.pfp;
@@ -263,7 +263,7 @@
         // UI Listeners
         ui.nameEdit.oninput = (e) => {
             userState.name = e.target.value.trim() || 'User';
-            localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
+            localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
         };
 
         ui.pfpTrigger.onclick = () => ui.pfpInput.click();
@@ -275,7 +275,7 @@
                 userState.pfp = ev.target.result;
                 ui.settingsPfp.src = userState.pfp;
                 ui.headerPfp.src = userState.pfp;
-                localStorage.setItem('lb_v2_identity_final', JSON.stringify(userState));
+                localStorage.setItem('lb_v3_identity', JSON.stringify(userState));
             };
             reader.readAsDataURL(file);
         };
@@ -358,10 +358,10 @@
         const applyTheme = (dark) => {
             document.body.classList.toggle('light-theme', !dark);
             ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
-            localStorage.setItem('lb_v2_theme_final', dark ? 'dark' : 'light');
+            localStorage.setItem('lb_v3_theme', dark ? 'dark' : 'light');
         };
         ui.themeBtn.onclick = () => applyTheme(document.body.classList.contains('light-theme'));
-        applyTheme(localStorage.getItem('lb_v2_theme_final') !== 'light');
+        applyTheme(localStorage.getItem('lb_v3_theme') !== 'light');
 
         ui.logoutBtn.onclick = () => {
             localStorage.clear();
