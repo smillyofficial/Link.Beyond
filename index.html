@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Link Beyond | Global Connection</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js" type="module"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@300;500;700;900&display=swap');
         
@@ -17,10 +13,9 @@
             --bg-color: #020617;
             --accent: #6366f1;
             --accent-glow: rgba(99, 102, 241, 0.4);
-            --card-bg: rgba(15, 23, 42, 0.6);
+            --card-bg: rgba(15, 23, 42, 0.7);
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #f8fafc;
-            --text-dim: #94a3b8;
             --bubble-them: rgba(255, 255, 255, 0.05);
         }
 
@@ -28,23 +23,22 @@
             --bg-color: #f1f5f9;
             --accent: #4f46e5;
             --accent-glow: rgba(79, 70, 229, 0.2);
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --border: rgba(0, 0, 0, 0.05);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(0, 0, 0, 0.08);
             --text-main: #0f172a;
-            --text-dim: #64748b;
-            --bubble-them: rgba(0, 0, 0, 0.03);
+            --bubble-them: rgba(0, 0, 0, 0.04);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
             color: var(--text-main);
+            height: 100dvh;
+            margin: 0;
             overflow: hidden;
-            height: 100vh;
-            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
         }
 
         .heading-font { font-family: 'Outfit', sans-serif; }
@@ -54,355 +48,341 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
         }
 
-        .chat-scroll::-webkit-scrollbar { width: 4px; }
-        .chat-scroll::-webkit-scrollbar-track { background: transparent; }
-        .chat-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; opacity: 0.5; }
+        .chat-scroll::-webkit-scrollbar { width: 3px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
         .bubble-me {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            box-shadow: 0 4px 15px var(--accent-glow);
-            border-radius: 20px 20px 4px 20px;
+            border-radius: 18px 18px 4px 18px;
             color: white;
         }
         
         .bubble-them {
             background: var(--bubble-them);
             border: 1px solid var(--border);
-            border-radius: 20px 20px 20px 4px;
+            border-radius: 18px 18px 18px 4px;
         }
 
-        .glow-text {
-            text-shadow: 0 0 15px var(--accent-glow);
+        .pfp-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            background: var(--border);
         }
 
-        .input-gradient {
-            background: rgba(128, 128, 128, 0.05);
+        .input-bar {
+            background: rgba(128, 128, 128, 0.08);
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .input-gradient:focus-within {
-            border-color: var(--accent);
-            background: rgba(128, 128, 128, 0.1);
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+            border-radius: 2rem;
         }
 
         #image-preview-container {
             display: none;
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.3s ease;
         }
 
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(10px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .btn-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-hover:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
+        /* Mobile specific adjustments */
+        @media (max-width: 640px) {
+            .bubble-me, .bubble-them { font-size: 14px; padding: 12px 16px; }
+            .pfp-circle { width: 28px; height: 28px; }
         }
 
-        /* Custom Toggle Switch */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
+        /* Settings Drawer Toggle */
+        #settings-panel {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #334155;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(24px); }
+        #settings-panel.open { transform: translateX(0); }
     </style>
 </head>
-<body class="flex items-center justify-center p-2 md:p-6">
+<body>
 
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center z-[200] px-4 hidden">
-        <div class="glass-panel p-10 rounded-[3rem] max-w-md w-full text-center border-white/20">
-            <div class="w-20 h-20 bg-indigo-600 rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-[0_0_40px_rgba(79,70,229,0.5)] rotate-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+    <!-- Auth Overlay -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-[200] px-6">
+        <div class="w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
             </div>
-            <h1 class="text-4xl font-black mb-2 heading-font tracking-tight glow-text text-white">LINK BEYOND</h1>
-            <p class="text-slate-400 mb-10 text-sm font-medium">Join the global stream of consciousness.</p>
+            <h1 class="text-3xl font-black heading-font tracking-tight text-white mb-2">LINK BEYOND</h1>
+            <p class="text-slate-500 mb-8 text-sm">Synchronize your consciousness.</p>
             
-            <div class="space-y-4">
-                <input type="text" id="username-input" maxlength="15" placeholder="Pick a username" 
-                    class="w-full p-5 bg-white/10 border border-white/20 rounded-2xl outline-none text-center font-bold text-xl text-white focus:border-indigo-500 transition-all placeholder:text-slate-500">
-                
-                <button id="join-btn" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-600/20 btn-hover uppercase tracking-widest">Enter Beyond</button>
-            </div>
+            <input type="text" id="username-input" maxlength="15" placeholder="Pick a username" 
+                class="w-full p-4 bg-white/5 border border-white/10 rounded-xl outline-none text-center font-bold text-lg text-white mb-4 focus:border-indigo-500 transition-all">
+            
+            <button id="join-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg btn-hover uppercase tracking-widest">Enter Beyond</button>
         </div>
     </div>
 
-    <!-- Main App UI -->
-    <div id="main-container" class="max-w-6xl w-full h-[95vh] glass-panel rounded-[3.5rem] flex flex-col overflow-hidden relative">
-        
-        <!-- Header -->
-        <header class="px-8 py-6 border-b border-white/5 flex justify-between items-center shrink-0">
-            <div class="flex items-center gap-4">
-                <div class="h-12 w-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-black heading-font tracking-tight glow-text">LINK BEYOND</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                        </span>
-                        <p id="user-count" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Synchronizing...</p>
-                    </div>
-                </div>
+    <!-- App Header -->
+    <header class="glass-panel px-4 py-3 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <button id="settings-toggle" class="w-12 h-12 flex items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-black/10 rounded-2xl transition-all border border-white/10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <h2 class="text-lg font-black heading-font tracking-tight">LINK BEYOND</h2>
+        </div>
+        <button id="settings-toggle" class="p-2 bg-white/5 rounded-xl border border-white/10">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </header>
+
+    <!-- Chat Stream -->
+    <main id="messages" class="flex-1 overflow-y-auto p-4 space-y-6 chat-scroll"></main>
+
+    <!-- Footer / Input -->
+    <footer class="p-3 pb-safe glass-panel border-t-0 rounded-t-[2rem]">
+        <div id="image-preview-container" class="mb-3 p-2 bg-indigo-600/10 rounded-2xl flex items-center justify-between border border-indigo-500/20">
+            <div class="flex items-center gap-3">
+                <img id="image-preview" src="" class="h-12 w-12 object-cover rounded-lg border border-indigo-500/50">
+                <span class="text-xs font-bold opacity-70 uppercase tracking-tighter">Visual Ready</span>
+            </div>
+            <button id="cancel-image" class="p-2 text-red-500"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+
+        <div class="input-bar p-1 flex items-center gap-2">
+            <input type="file" id="image-input" accept="image/*" class="hidden">
+            <button id="upload-btn" class="p-3 bg-indigo-600 text-white rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             </button>
-        </header>
+            <form id="chat-form" class="flex-1 flex items-center gap-2">
+                <input type="text" id="msg-input" placeholder="Say something..." class="flex-1 bg-transparent py-2 outline-none font-medium text-inherit">
+                <button type="submit" class="p-3 px-5 bg-indigo-600 text-white rounded-2xl font-black text-xs tracking-widest uppercase">Send</button>
+            </form>
+        </div>
+    </footer>
 
-        <!-- Messages Area -->
-        <main id="messages" class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 chat-scroll"></main>
+    <!-- Settings Sidebar -->
+    <aside id="settings-panel" class="fixed inset-y-0 right-0 w-[85%] max-w-sm glass-panel z-[150] p-8 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center mb-10">
+            <h3 class="text-xl font-black heading-font uppercase tracking-widest">Profile</h3>
+            <button id="close-settings" class="p-2 opacity-50"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
 
-        <!-- Dynamic Footer -->
-        <footer class="p-6 md:p-8 shrink-0 relative">
-            
-            <div id="image-preview-container" class="absolute bottom-full left-8 right-8 mb-4 glass-panel p-4 rounded-3xl flex items-center justify-between border-indigo-500/50 shadow-2xl">
-                <div class="flex items-center gap-4">
-                    <img id="image-preview" src="" class="h-20 w-20 object-cover rounded-2xl border-2 border-indigo-500">
-                    <div>
-                        <p class="text-sm font-bold">Attachment Ready</p>
-                        <p class="text-[10px] opacity-50 uppercase font-bold tracking-widest">Visual Stream</p>
+        <div class="space-y-8 flex-1">
+            <!-- PFP Customization -->
+            <div class="text-center">
+                <div class="relative inline-block group cursor-pointer" id="pfp-trigger">
+                    <img id="settings-pfp" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" class="w-24 h-24 rounded-full border-4 border-indigo-600 object-cover bg-slate-800">
+                    <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
+                    <input type="file" id="pfp-input" accept="image/*" class="hidden">
                 </div>
-                <button id="cancel-image" class="w-10 h-10 flex items-center justify-center bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <p class="mt-4 font-bold text-lg" id="display-name">Username</p>
+                <p class="text-[10px] text-indigo-500 uppercase font-black tracking-widest">Active Identity</p>
+            </div>
+
+            <!-- Appearance -->
+            <div class="p-5 bg-black/5 dark:bg-white/5 rounded-2xl flex items-center justify-between border border-white/5">
+                <div>
+                    <p class="font-bold">Appearance</p>
+                    <p id="theme-label" class="text-[10px] opacity-50 uppercase font-black">Dark Mode</p>
+                </div>
+                <button id="theme-toggle-btn" class="p-3 bg-indigo-600/20 text-indigo-400 rounded-xl">
+                    <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                 </button>
             </div>
 
-            <!-- Input Bar -->
-            <div class="input-gradient rounded-[2.5rem] p-3 flex items-center gap-3">
-                <input type="file" id="image-input" accept="image/*" class="hidden">
-                <button id="upload-btn" class="h-14 w-14 flex items-center justify-center bg-indigo-600 text-white rounded-[1.5rem] hover:bg-indigo-500 shadow-lg shadow-indigo-600/20 btn-hover shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                </button>
-                <form id="chat-form" class="flex-1 flex gap-3">
-                    <input type="text" id="msg-input" placeholder="Type into the beyond..." 
-                        class="flex-1 bg-transparent px-4 py-3 outline-none font-bold text-lg text-inherit placeholder:text-slate-500">
-                    <button type="submit" class="h-14 px-8 bg-indigo-600 text-white rounded-[1.5rem] font-black tracking-wider btn-hover shadow-xl shrink-0">SEND</button>
-                </form>
-            </div>
-        </footer>
-
-        <!-- Settings Drawer -->
-        <aside id="settings-panel" class="absolute inset-y-0 right-[-100%] w-full md:w-[400px] glass-panel backdrop-blur-3xl z-[150] transition-all duration-500 ease-in-out p-10 flex flex-col">
-            <div class="flex justify-between items-center mb-12">
-                <h3 class="text-xl font-black heading-font uppercase tracking-widest glow-text">Configuration</h3>
-                <button id="close-settings" class="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-red-500/20 hover:text-red-500 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-            
-            <div class="space-y-6 flex-1">
-                <div class="p-6 bg-black/5 dark:bg-white/5 rounded-[2rem] border border-white/5 flex items-center justify-between">
-                    <div>
-                        <p class="font-bold text-lg">Void Pulse</p>
-                        <p id="theme-status" class="text-[10px] text-indigo-400 font-black uppercase">Dark State</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="theme-switch" checked>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="mt-auto pt-10">
-                    <button id="logout-btn" class="w-full py-5 text-red-500 font-black tracking-widest bg-red-500/10 rounded-2xl hover:bg-red-500 hover:text-white transition-all">RESET IDENTITY</button>
-                </div>
-            </div>
-        </aside>
-    </div>
+            <button id="logout-btn" class="w-full py-4 text-red-500 font-bold bg-red-500/10 rounded-xl mt-auto">Reset Identity</button>
+        </div>
+    </aside>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-ultimate-v2';
+        // GITHUB COMPATIBILITY: Robust config fetching
+        let config;
+        try {
+            config = JSON.parse(__firebase_config);
+        } catch(e) {
+            console.error("Firebase config missing. Ensure environment variables are set.");
+        }
 
-        const app = initializeApp(firebaseConfig);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'link-beyond-gh';
+        const app = initializeApp(config);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let currentUser = null;
-        let pendingImageData = null;
+        let userState = { uid: null, name: '', pfp: 'https://api.dicebear.com/7.x/avataaars/svg?seed=default' };
+        let pendingImg = null;
 
         const ui = {
             authModal: document.getElementById('auth-modal'),
-            usernameInput: document.getElementById('username-input'),
+            nameIn: document.getElementById('username-input'),
             joinBtn: document.getElementById('join-btn'),
-            msgList: document.getElementById('messages'),
+            messages: document.getElementById('messages'),
             chatForm: document.getElementById('chat-form'),
-            msgInput: document.getElementById('msg-input'),
+            msgIn: document.getElementById('msg-input'),
             uploadBtn: document.getElementById('upload-btn'),
-            imageInput: document.getElementById('image-input'),
+            imgIn: document.getElementById('image-input'),
             imgPreviewCont: document.getElementById('image-preview-container'),
             imgPreview: document.getElementById('image-preview'),
             cancelImg: document.getElementById('cancel-image'),
             settingsToggle: document.getElementById('settings-toggle'),
             settingsPanel: document.getElementById('settings-panel'),
             closeSettings: document.getElementById('close-settings'),
-            logoutBtn: document.getElementById('logout-btn'),
-            userCount: document.getElementById('user-count'),
-            themeSwitch: document.getElementById('theme-switch'),
-            themeStatus: document.getElementById('theme-status')
+            pfpTrigger: document.getElementById('pfp-trigger'),
+            pfpInput: document.getElementById('pfp-input'),
+            settingsPfp: document.getElementById('settings-pfp'),
+            displayName: document.getElementById('display-name'),
+            themeBtn: document.getElementById('theme-toggle-btn'),
+            themeLabel: document.getElementById('theme-label'),
+            logoutBtn: document.getElementById('logout-btn')
         };
 
-        // Theme Logic
-        const applyTheme = (isDark) => {
-            if (isDark) {
-                document.body.classList.remove('light-theme');
-                ui.themeStatus.textContent = "Dark State";
-            } else {
-                document.body.classList.add('light-theme');
-                ui.themeStatus.textContent = "Light State";
+        // --- IDENTITY & AUTH ---
+        const initIdentity = () => {
+            const saved = localStorage.getItem('lb_identity');
+            if (saved) {
+                userState = JSON.parse(saved);
+                ui.settingsPfp.src = userState.pfp;
+                ui.displayName.textContent = userState.name;
             }
-            localStorage.setItem('lb_theme_mode', isDark ? 'dark' : 'light');
         };
 
-        ui.themeSwitch.addEventListener('change', (e) => applyTheme(e.target.checked));
-        
-        // Load initial theme
-        const savedTheme = localStorage.getItem('lb_theme_mode');
-        if (savedTheme === 'light') {
-            ui.themeSwitch.checked = false;
-            applyTheme(false);
-        }
+        const saveIdentity = () => localStorage.setItem('lb_identity', JSON.stringify(userState));
 
-        const censorMessage = (text) => {
-            const nRegex = /\bn[il|1!][g9q]+[e3a4@*]r[s5z]?\b/gi;
-            const nSoftRegex = /\bn[il|1!][g9q]+[a4@*]\b/gi;
-            const bypassRegex = /n[\s\W_.]*[il|1!][\s\W_.]*[g9q][\s\W_.]*[g9q][\s\W_.]*[e3a4@*][\s\W_.]*r/gi;
-            const bypassSoftRegex = /n[\s\W_.]*[il|1!][\s\W_.]*[g9q][\s\W_.]*[g9q][\s\W_.]*[a4@*]/gi;
-            return text.replace(nRegex, '****').replace(nSoftRegex, '****').replace(bypassRegex, '****').replace(bypassSoftRegex, '****');
-        };
-
-        const setupAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
+        const startAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error("Auth failed:", err); }
         };
 
         onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (!user) setupAuth();
-            else {
-                const saved = localStorage.getItem('lb_user');
-                if (saved) login(saved);
+            if (user) {
+                userState.uid = user.uid;
+                initIdentity();
+                if (userState.name) login();
                 else ui.authModal.classList.remove('hidden');
-            }
+            } else startAuth();
         });
 
-        const login = (name) => {
-            localStorage.setItem('lb_user', name);
+        const login = () => {
             ui.authModal.classList.add('hidden');
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(50));
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), limit(40));
             onSnapshot(q, (snap) => {
-                const msgs = snap.docs.map(doc => ({id: doc.id, ...doc.data()}))
-                    .sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
+                const msgs = snap.docs.map(doc => doc.data()).sort((a,b) => (a.timestamp?.toMillis() || 0) - (b.timestamp?.toMillis() || 0));
                 render(msgs);
-                ui.userCount.textContent = `Online Streams: ${snap.size}`;
             });
         };
 
-        ui.joinBtn.addEventListener('click', () => {
-            const val = ui.usernameInput.value.trim();
-            if (val.length >= 2) login(val);
-        });
+        ui.joinBtn.onclick = () => {
+            const val = ui.nameIn.value.trim();
+            if (val.length >= 2) {
+                userState.name = val;
+                saveIdentity();
+                login();
+            }
+        };
 
-        ui.uploadBtn.addEventListener('click', () => ui.imageInput.click());
-        ui.imageInput.addEventListener('change', (e) => {
+        // --- PFP SYSTEM ---
+        ui.pfpTrigger.onclick = () => ui.pfpInput.click();
+        ui.pfpInput.onchange = (e) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (event) => {
-                pendingImageData = event.target.result;
-                ui.imgPreview.src = pendingImageData;
+            reader.onload = (ev) => {
+                userState.pfp = ev.target.result;
+                ui.settingsPfp.src = userState.pfp;
+                saveIdentity();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // --- THEME ---
+        let isDark = localStorage.getItem('lb_theme') !== 'light';
+        const applyTheme = (dark) => {
+            isDark = dark;
+            document.body.classList.toggle('light-theme', !dark);
+            ui.themeLabel.textContent = dark ? "Dark Mode" : "Light Mode";
+            localStorage.setItem('lb_theme', dark ? 'dark' : 'light');
+        };
+        ui.themeBtn.onclick = () => applyTheme(!isDark);
+        applyTheme(isDark);
+
+        // --- CHAT LOGIC ---
+        ui.uploadBtn.onclick = () => ui.imgIn.click();
+        ui.imgIn.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                pendingImg = ev.target.result;
+                ui.imgPreview.src = pendingImg;
                 ui.imgPreviewCont.style.display = 'flex';
             };
             reader.readAsDataURL(file);
-        });
+        };
 
-        ui.cancelImg.addEventListener('click', () => {
-            pendingImageData = null;
+        ui.cancelImg.onclick = () => {
+            pendingImg = null;
             ui.imgPreviewCont.style.display = 'none';
-            ui.imageInput.value = '';
-        });
+        };
 
-        ui.chatForm.addEventListener('submit', async (e) => {
+        ui.chatForm.onsubmit = async (e) => {
             e.preventDefault();
-            const text = ui.msgInput.value.trim();
-            if (!text && !pendingImageData) return;
-            const name = localStorage.getItem('lb_user') || 'Wanderer';
+            const text = ui.msgIn.value.trim();
+            if (!text && !pendingImg) return;
+
+            const payload = {
+                uid: userState.uid,
+                author: userState.name,
+                pfp: userState.pfp,
+                body: text,
+                image: pendingImg,
+                timestamp: serverTimestamp()
+            };
+
+            ui.msgIn.value = '';
+            pendingImg = null;
+            ui.imgPreviewCont.style.display = 'none';
+
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
-                    uid: currentUser.uid,
-                    author: name,
-                    body: censorMessage(text),
-                    image: pendingImageData || null,
-                    timestamp: serverTimestamp()
-                });
-                ui.msgInput.value = '';
-                pendingImageData = null;
-                ui.imgPreviewCont.style.display = 'none';
-            } catch (err) { console.error(err); }
-        });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), payload);
+            } catch (err) { console.error("Send failed:", err); }
+        };
 
         const render = (msgs) => {
-            ui.msgList.innerHTML = '';
+            ui.messages.innerHTML = '';
             msgs.forEach(m => {
-                const isMe = m.uid === currentUser?.uid;
-                const div = document.createElement('div');
-                div.className = `flex ${isMe ? 'justify-end' : 'justify-start'} animate__animated animate__fadeInUp animate__faster`;
-                div.innerHTML = `
-                    <div class="max-w-[85%] md:max-w-[70%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                        <span class="text-[10px] font-black text-indigo-500 mb-1 px-2 uppercase tracking-widest">${m.author}</span>
-                        <div class="p-5 rounded-3xl ${isMe ? 'bubble-me' : 'bubble-them'}">
-                            ${m.image ? `<img src="${m.image}" class="rounded-2xl mb-3 max-h-80 w-full object-contain bg-black/10">` : ''}
-                            ${m.body ? `<p class="font-semibold text-[15px] leading-relaxed break-words">${m.body}</p>` : ''}
+                const isMe = m.uid === userState.uid;
+                const row = document.createElement('div');
+                row.className = `flex gap-3 items-end ${isMe ? 'flex-row-reverse' : 'flex-row'}`;
+                
+                row.innerHTML = `
+                    <img src="${m.pfp || 'https://api.dicebear.com/7.x/avataaars/svg?seed=anon'}" class="pfp-circle mb-1">
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[75%]">
+                        <span class="text-[9px] font-black opacity-40 uppercase tracking-tighter mb-1 px-1">${m.author}</span>
+                        <div class="p-3 md:p-4 ${isMe ? 'bubble-me' : 'bubble-them'}">
+                            ${m.image ? `<img src="${m.image}" class="rounded-xl mb-2 max-h-64 w-full object-contain bg-black/5">` : ''}
+                            ${m.body ? `<p class="font-semibold leading-tight break-words">${m.body}</p>` : ''}
                         </div>
                     </div>
                 `;
-                ui.msgList.appendChild(div);
+                ui.messages.appendChild(row);
             });
-            ui.msgList.scrollTop = ui.msgList.scrollHeight;
+            ui.messages.scrollTop = ui.messages.scrollHeight;
         };
 
-        ui.settingsToggle.addEventListener('click', () => ui.settingsPanel.style.right = '0');
-        ui.closeSettings.addEventListener('click', () => ui.settingsPanel.style.right = '-100%');
-        ui.logoutBtn.addEventListener('click', () => { localStorage.clear(); window.location.reload(); });
+        // UI toggles
+        ui.settingsToggle.onclick = () => ui.settingsPanel.classList.add('open');
+        ui.closeSettings.onclick = () => ui.settingsPanel.classList.remove('open');
+        ui.logoutBtn.onclick = () => { localStorage.clear(); location.reload(); };
     </script>
 </body>
 </html>
